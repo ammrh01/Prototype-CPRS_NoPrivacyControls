@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Campus Parking Registration</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; background-color: #f4f4f4; }
+        .form-container { background: white; padding: 20px; border-radius: 8px; max-width: 400px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Parking Permit Form</h2>
+    <input type="text" id="student_name" placeholder="Full Name">
+    <input type="text" id="matric_number" placeholder="Matric Number">
+    <input type="text" id="phone_number" placeholder="Phone Number">
+    <input type="text" id="license_plate" placeholder="License Plate">
+    <input type="text" id="vehicle_model" placeholder="Vehicle Model (e.g. Proton Saga)">
+    <button onclick="submitData()">Submit Application</button>
+</div>
+
+<script>
+    async function submitData() {
+        const payload = {
+            student_name: document.getElementById('student_name').value,
+            matric_number: document.getElementById('matric_number').value,
+            phone_number: document.getElementById('phone_number').value,
+            license_plate: document.getElementById('license_plate').value,
+            vehicle_model: document.getElementById('vehicle_model').value
+        };
+
+        const response = await fetch('http://127.0.0.1:5000/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        alert(result.message);
+    }
+</script>
+
+</body>
+</html>

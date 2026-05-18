@@ -15,12 +15,16 @@ def setup_and_populate_db():
     cursor = connection.cursor()
     
     # Phase 1: Create the table for raw PII storage [cite: 29, 34]
+    # Expanded with three new attributes for advanced PET analysis
     cursor.execute('''CREATE TABLE IF NOT EXISTS permits 
                      (student_name TEXT, 
                       matric_number TEXT, 
                       phone_number TEXT, 
                       license_plate TEXT, 
-                      vehicle_model TEXT)''')
+                      vehicle_model TEXT,
+                      registration_date TEXT,
+                      faculty TEXT,
+                      monthly_parking_hours INTEGER)''')
     
     # Check if the table already has data to avoid duplicates
     cursor.execute("SELECT COUNT(*) FROM permits")
@@ -30,12 +34,15 @@ def setup_and_populate_db():
             with open(CSV_FILE, mode='r') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
-                    cursor.execute('''INSERT INTO permits VALUES (?, ?, ?, ?, ?)''', 
+                    cursor.execute('''INSERT INTO permits VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', 
                                  (row['student_name'], 
                                   row['matric_number'], 
                                   row['phone_number'], 
                                   row['license_plate'], 
-                                  row['vehicle_model']))
+                                  row['vehicle_model'],
+                                  row['registration_date'],
+                                  row['faculty'],
+                                  row['monthly_parking_hours']))
             print("Auto-population complete.")
         except FileNotFoundError:
             print(f"Warning: {CSV_FILE} not found. Starting with empty DB.")
@@ -50,12 +57,16 @@ def register_parking():
     connection = sqlite3.connect(DB_FILE)
     cursor = connection.cursor()
     
-    cursor.execute("INSERT INTO permits VALUES (?, ?, ?, ?, ?)", 
+    # Accept all incoming fields directly in plaintext for Phase 1 [cite: 26, 31]
+    cursor.execute("INSERT INTO permits VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
                   (data.get('student_name'), 
                    data.get('matric_number'), 
                    data.get('phone_number'), 
                    data.get('license_plate'), 
-                   data.get('vehicle_model')))
+                   data.get('vehicle_model'),
+                   data.get('registration_date'),
+                   data.get('faculty'),
+                   data.get('monthly_parking_hours')))
     
     connection.commit()
     connection.close()
@@ -64,5 +75,5 @@ def register_parking():
 if __name__ == '__main__':
     # Run the setup before the server starts
     setup_and_populate_db()
-    # Run the micro-prototype locally for total architectural visibility [cite: 18]
+    # Run the micro-prototype locally for total architectural visibility 
     app.run(port=5000, debug=True)
